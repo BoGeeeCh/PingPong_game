@@ -6,6 +6,10 @@ window.fill((66,170,255))
 
 clock = time.Clock()
 
+chet = 0
+chet_p1 = 0
+chet_p2 = 0
+
 class GameSprite(sprite.Sprite):
     def __init__(self, speed, x, y, player_file_name, w, h):
         super().__init__()
@@ -26,15 +30,26 @@ class Ball(GameSprite):
         self.speed_y = self.speed
 
     def update(self):
+        global chet_p1
+        global chet_p2
         self.rect.x += self.speed_x
         self.rect.y += self.speed_y
 
-        if self.rect.x <= 0 or self.rect.x >= 650:
+        if self.rect.x <= 0:
+            self.rect.x = 350
+            self.rect.y = 350
             self.speed_x *= self.reverse
-        
+            chet_p2 += 1
+
+        if self.rect.x >= 650:
+            self.rect.x = 350
+            self.rect.y = 350
+            self.speed_x *= self.reverse
+            chet_p1 += 1
+         
         if self.rect.y <= 0 or self.rect.y >= 450:
             self.speed_y *= self.reverse
-
+        
 class Platform(GameSprite):
     def __init__(self, speed, x, y, player_file_name, w, h):
         super().__init__(speed, x, y, player_file_name, w, h)
@@ -61,10 +76,6 @@ platform2 = Platform(10, 670, 250, 'gray_platform.png', 15, 100)
 platforms = sprite.Group()
 platforms.add(platform1)
 platforms.add(platform2)
-
-chet = 0
-chet_p1 = 0
-chet_p2 = 0
 
 font1 = font.Font(None, 25)
 
@@ -100,15 +111,22 @@ while game:
         ball1, platforms, False
     )   
 
-    if sprites_list:
+    sprites_list1 = sprite.collide_rect(
+        ball1, platform1
+    )   
+
+    sprites_list2 = sprite.collide_rect(
+        ball1, platform2
+    )   
+
+    if sprites_list1:
         ball1.speed_x *= ball1.reverse
+
+    if sprites_list2:
+        ball1.speed_x *= ball1.reverse
+
+    if sprites_list:
         chet += 1
-
-    if ball1.rect.x <= 60:
-        chet_p2 += 1
-
-    if ball1.rect.x >= 620:
-        chet_p1 += 1
 
     for e in event.get():
         if e.type == QUIT:
