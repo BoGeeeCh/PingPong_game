@@ -39,12 +39,14 @@ class Ball(GameSprite):
             self.rect.x = 350
             self.rect.y = 350
             self.speed_x *= self.reverse
+            self.speed_y *= self.reverse
             chet_p2 += 1
 
         if self.rect.x >= 650:
             self.rect.x = 350
             self.rect.y = 350
             self.speed_x *= self.reverse
+            self.speed_y *= self.reverse
             chet_p1 += 1
          
         if self.rect.y <= 0 or self.rect.y >= 450:
@@ -69,7 +71,7 @@ class Platform(GameSprite):
 
 
 
-ball1 = Ball(10, 350, 250, 'cyborg.png', 50, 50)
+ball1 = Ball(5, 350, 250, 'cyborg.png', 50, 50)
 platform1 = Platform(10, 30, 250, 'gray_platform.png', 15, 100)
 platform2 = Platform(10, 670, 250, 'gray_platform.png', 15, 100)
 
@@ -103,7 +105,7 @@ while game:
     window.blit(question, (25, 60))
 
     question = font1.render(
-        'Общий счёт: ' + str(chet), True, (255, 255, 255)
+        'Cчёт касаний: ' + str(chet), True, (255, 255, 255)
     ) 
     window.blit(question, (25, 20))
 
@@ -121,9 +123,11 @@ while game:
 
     if sprites_list1:
         ball1.speed_x *= ball1.reverse
+        ball1.rect.x += 15
 
     if sprites_list2:
         ball1.speed_x *= ball1.reverse
+        ball1.rect.x -= 15
 
     if sprites_list:
         chet += 1
