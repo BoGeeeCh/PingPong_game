@@ -69,6 +69,24 @@ class Platform(GameSprite):
         if key_pressed[K_DOWN] and self.rect.y <= 400:
             self.rect.y += self.speed
 
+fon_b = 0
+
+class Pect():
+    def __init__(self, pect_x, pect_y, w, h, release_time, file_name):
+        self.time = release_time
+        self.image = transform.scale(image.load(file_name), (w, h))
+        self.rect = self.image.get_rect()
+        self.rect.x = pect_x
+        self.rect.y = pect_y
+
+    def update(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
+
+
+
+rect1 = Pect(320, 320, 50, 50, 75, 'knopka.png')
+rect_fon = Pect(0, 0, 750, 500, 30, 'black_fon.jpg')
+
 
 
 ball1 = Ball(5, 350, 250, 'cyborg.png', 50, 50)
@@ -81,57 +99,78 @@ platforms.add(platform2)
 
 font1 = font.Font(None, 25)
 
+b_del = 10
+pp = False
+play = False
 game = True
 while game:
     clock.tick(60)
     display.update()
-    window.fill((66,170,255))
-    ball1.reset()
-    ball1.update()
-    key_pressed = key.get_pressed()
-    platform1.reset()
-    platform1.update()
-    platform2.reset()
-    platform2.update_2()
+    if play == True:
+        window.fill((66,170,255))
+        ball1.reset()
+        ball1.update()
+        key_pressed = key.get_pressed()
+        platform1.reset()
+        platform1.update()
+        platform2.reset()
+        platform2.update_2()
 
-    question = font1.render(
-        'Счёт_p1: ' + str(chet_p1), True, (255, 255, 255)
-    ) 
-    window.blit(question, (25, 40))
+        question = font1.render(
+            'Счёт_p1: ' + str(chet_p1), True, (255, 255, 255)
+        ) 
+        window.blit(question, (25, 40))
 
-    question = font1.render(
-        'Счёт_p2: ' + str(chet_p2), True, (255, 255, 255)
-    ) 
-    window.blit(question, (25, 60))
+        question = font1.render(
+            'Счёт_p2: ' + str(chet_p2), True, (255, 255, 255)
+        ) 
+        window.blit(question, (25, 60))
 
-    question = font1.render(
-        'Cчёт касаний: ' + str(chet), True, (255, 255, 255)
-    ) 
-    window.blit(question, (25, 20))
+        question = font1.render(
+            'Cчёт касаний: ' + str(chet), True, (255, 255, 255)
+        ) 
+        window.blit(question, (25, 20))
 
-    sprites_list = sprite.spritecollide(
-        ball1, platforms, False
-    )   
+        sprites_list = sprite.spritecollide(
+            ball1, platforms, False
+        )   
 
-    sprites_list1 = sprite.collide_rect(
-        ball1, platform1
-    )   
+        sprites_list1 = sprite.collide_rect(
+            ball1, platform1
+        )   
 
-    sprites_list2 = sprite.collide_rect(
-        ball1, platform2
-    )   
+        sprites_list2 = sprite.collide_rect(
+            ball1, platform2
+        )   
 
-    if sprites_list1:
-        ball1.speed_x *= ball1.reverse
-        ball1.rect.x += 15
+        if sprites_list1:
+            ball1.speed_x *= ball1.reverse
+            ball1.rect.x += 15
 
-    if sprites_list2:
-        ball1.speed_x *= ball1.reverse
-        ball1.rect.x -= 15
+        if sprites_list2:
+            ball1.speed_x *= ball1.reverse
+            ball1.rect.x -= 15
 
-    if sprites_list:
-        chet += 1
+        if sprites_list:
+            chet += 1
 
+    else:
+        window.fill((200, 255, 200))
+        rect1.update()
     for e in event.get():
+        if e.type == MOUSEBUTTONDOWN and e.button == 1:
+                x, y = e.pos
+                if rect1.rect.collidepoint(x, y):
+                    pp = True
         if e.type == QUIT:
             game = False
+    if pp:
+        rect_fon.update()
+        fon_b -= b_del
+        rect_fon.image.set_alpha(abs(fon_b))
+        if fon_b <= -255:
+            b_del *= -1
+            play = True
+        if fon_b >= 1:
+            pp = False
+            b_del = 30
