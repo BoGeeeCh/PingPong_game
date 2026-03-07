@@ -1,10 +1,12 @@
 from pygame import *
+import json
 init()
 
 window = display.set_mode((700, 500))
 window.fill((66,170,255))
 
 clock = time.Clock()
+
 
 chet = 0
 chet_p1 = 0
@@ -82,12 +84,46 @@ class Pect():
     def update(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
+class Leaderboard():
+    def __init__(self):
+        self.points = []
+        self.y = 20
+        self.cards = []
 
+    def render(self):
+        for i in range (len(self.points)):
+            font1 = font.Font(None, 40)
+            
+            self.cards.append(
+                font1.render(
+                    str(self.points[i]), True, (0, 0, 0)
+                )   
+            )
+
+    def moving(self):
+        self.points.sort(reverse=True)
+        if len(self.points) >= 5:
+            self.points.pop()
+        
+
+    def points_add(self):
+        with open ("f.json", "r") as file:
+            try:
+                self.points = json.load(file)["player"]
+            except:
+                self.points = []
+        self.render()
+
+    def reset(self):
+        self.y = 20
+        for card in self.cards:
+            window.blit(card, (620, self.y))
+            self.y += 30
+
+element = Leaderboard()
 
 rect1 = Pect(320, 320, 50, 50, 75, 'knopka.png')
 rect_fon = Pect(0, 0, 750, 500, 30, 'black_fon.jpg')
-
-
 
 ball1 = Ball(5, 350, 250, 'cyborg.png', 50, 50)
 platform1 = Platform(10, 30, 250, 'gray_platform.png', 15, 100)
@@ -98,6 +134,8 @@ platforms.add(platform1)
 platforms.add(platform2)
 
 font1 = font.Font(None, 25)
+
+element.points_add()
 
 b_del = 10
 pp = False
@@ -127,7 +165,7 @@ while game:
         window.blit(question, (25, 60))
 
         question = font1.render(
-            'Cчёт касаний: ' + str(chet), True, (255, 255, 255)
+            'Общий счёт: ' + str(chet_p1 + chet_p2), True, (255, 255, 255)
         ) 
         window.blit(question, (25, 20))
 
@@ -157,6 +195,12 @@ while game:
     else:
         window.fill((200, 255, 200))
         rect1.update()
+        element.reset()
+        font5 = font.Font(None, 35)
+        question5 = font5.render(
+            'Лучший результат:', True, (0, 0, 0)
+        ) 
+        window.blit(question5, (380, 20))
     for e in event.get():
         if e.type == MOUSEBUTTONDOWN and e.button == 1:
                 x, y = e.pos
@@ -164,6 +208,7 @@ while game:
                     pp = True
         if e.type == QUIT:
             game = False
+
     if pp:
         rect_fon.update()
         fon_b -= b_del
@@ -174,3 +219,9 @@ while game:
         if fon_b >= 1:
             pp = False
             b_del = 30
+
+with open ("f.json", "w", encoding = 'utf-8') as file:
+    element.points.append(chet_p1 + chet_p2)
+    print(element.points)
+    element.moving()
+    json.dump({'player': element.points}, file, ensure_ascii = False)
